@@ -27,3 +27,8 @@ spec:
   - $(kubectl get nodes -o jsonpath='{ $.items[*].status.addresses[?(@.type=="InternalIP")].address }')/32
 EOF
 ```
+
+Get the password for `root` user:
+```bash
+kubectl get secret gitlab-gitlab-initial-root-password -ojsonpath='{.data.password}' | base64 --decode ; echo
+```
