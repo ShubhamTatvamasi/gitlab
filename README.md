@@ -7,5 +7,6 @@ helm repo add gitlab https://charts.gitlab.io/
 
 Install GitLab:
 ```
-helm upgrade -i gitlab gitlab/gitlab
+helm upgrade -i gitlab gitlab/gitlab \
+  --set certmanager-issuer.email=shubhamtatvamasi@gmail.com
 ```
