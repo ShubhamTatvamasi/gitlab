@@ -1,0 +1,8 @@
+---
+- name: Install and register GitLab Runner
+  hosts: all
+  become: true
+  roles:
+    - docker
+    - gitlab_runner
+    - gitlab_runner_register

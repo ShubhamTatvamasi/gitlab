@@ -1,0 +1,10 @@
+---
+# Defaults for gitlab_runner_register
+gitlab_runner_binary_path: /usr/local/bin/gitlab-runner
+gitlab_runner_coordinator_url: ""
+gitlab_runner_registration_token: ""
+gitlab_runner_description: "gitlab-runner"
+gitlab_runner_tags: "gitlab-runner"
+gitlab_runner_executor: "shell"
+gitlab_runner_lock: false
+gitlab_runner_service_name: gitlab-runner

@@ -1,0 +1,48 @@
+---
+- name: Ensure curl is installed
+  ansible.builtin.package:
+    name: curl
+    state: present
+
+- name: Ensure gitlab-runner group/user exist
+  ansible.builtin.user:
+    name: "{{ gitlab_runner_user }}"
+    comment: "GitLab Runner"
+    home: "{{ gitlab_runner_home }}"
+    shell: "{{ gitlab_runner_shell }}"
+    create_home: true
+    system: false
+
+- name: Download gitlab-runner binary
+  ansible.builtin.get_url:
+    url: "{{ gitlab_runner_binary_url }}"
+    dest: "{{ gitlab_runner_binary_path }}"
+    mode: '0755'
+    force: "{{ gitlab_runner_force_install }}"
+    validate_certs: true
+  register: gitlab_runner_download
+
+- name: Ensure runner binary is executable
+  ansible.builtin.file:
+    path: "{{ gitlab_runner_binary_path }}"
+    mode: '0755'
+    owner: root
+    group: root
+
+- name: Install gitlab-runner service
+  ansible.builtin.command: "{{ gitlab_runner_binary_path }} install --user={{ gitlab_runner_user }} --working-directory={{ gitlab_runner_home }}"
+  args:
+    creates: /etc/systemd/system/{{ gitlab_runner_service_name }}.service
+  notify: restart gitlab-runner
+
+- name: Start gitlab-runner service
+  ansible.builtin.service:
+    name: "{{ gitlab_runner_service_name }}"
+    state: started
+    enabled: true
+
+- name: Add {{ gitlab_runner_user }} to docker group
+  ansible.builtin.user:
+    name: "{{ gitlab_runner_user }}"
+    groups: docker
+    append: yes

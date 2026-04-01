@@ -1,0 +1,13 @@
+---
+# Defaults for gitlab_runner
+gitlab_runner_binary_url: "https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-linux-amd64"
+gitlab_runner_binary_path: /usr/local/bin/gitlab-runner
+gitlab_runner_user: gitlab-runner
+gitlab_runner_home: /home/gitlab-runner
+gitlab_runner_shell: /bin/bash
+gitlab_runner_service_name: gitlab-runner
+
+gitlab_runner_lock: false
+
+# Keep false unless you want to force reinstall.
+gitlab_runner_force_install: false

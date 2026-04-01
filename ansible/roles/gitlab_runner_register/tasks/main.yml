@@ -1,0 +1,24 @@
+---
+- name: Check if gitlab-runner is already registered
+  ansible.builtin.command: "{{ gitlab_runner_binary_path }} list"
+  register: gitlab_runner_list
+  ignore_errors: true
+
+- name: Fail when no registration token provided
+  fail:
+    msg: "gitlab_runner_registration_token is required to register runner"
+  when: gitlab_runner_registration_token == ''
+
+- name: Register gitlab-runner with GitLab
+  ansible.builtin.command: >
+    {{ gitlab_runner_binary_path }} register --non-interactive
+    --url {{ gitlab_runner_coordinator_url }}
+    --registration-token {{ gitlab_runner_registration_token }}
+    --executor {{ gitlab_runner_executor }}
+    --description "{{ gitlab_runner_description }}"
+    --tag-list "{{ gitlab_runner_tags }}"
+    --run-untagged true
+    --locked {{ gitlab_runner_lock | ternary('true', 'false') }}
+  when: "'gitlab-runner' not in (gitlab_runner_list.stdout | default(''))"
+  register: gitlab_runner_registration
+  notify: restart gitlab-runner
