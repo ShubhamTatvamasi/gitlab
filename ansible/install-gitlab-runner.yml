@@ -4,5 +4,6 @@
   become: true
   roles:
     - docker
+    - prerequisites
     - gitlab_runner
     - gitlab_runner_register
