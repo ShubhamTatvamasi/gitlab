@@ -46,3 +46,10 @@
     name: "{{ gitlab_runner_user }}"
     groups: docker
     append: yes
+
+- name: Remove legacy .bash_logout file from gitlab-runner home
+  ansible.builtin.file:
+    path: "{{ gitlab_runner_home }}/.bash_logout"
+    state: absent
+    owner: "{{ gitlab_runner_user }}"
+    group: "{{ gitlab_runner_user }}"
