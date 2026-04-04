@@ -1,0 +1,49 @@
+---
+- name: Fail on unsupported architecture for Node.js 24 LTS
+  ansible.builtin.fail:
+    msg: "Unsupported architecture {{ ansible_architecture }} for Node.js 24 binary install"
+  when: ansible_architecture not in ['x86_64', 'aarch64']
+
+- name: Set Node.js binary architecture
+  ansible.builtin.set_fact:
+    nodejs_archive_arch: "{{ 'linux-x64' if ansible_architecture == 'x86_64' else 'linux-arm64' }}"
+
+- name: Ensure curl and tar are installed
+  ansible.builtin.apt:
+    name:
+      - curl
+      - tar
+    state: present
+    update_cache: yes
+
+- name: Find latest Node.js 24.x tarball name
+  ansible.builtin.shell: |
+    set -e
+    curl -fsSL https://nodejs.org/dist/latest-v24.x/ | \
+      grep -oE 'node-v24\.[0-9]+\.[0-9]+-{{ nodejs_archive_arch }}\.tar\.xz' | \
+      head -1
+  register: nodejs_filename
+  changed_when: false
+  failed_when: nodejs_filename.stdout == ''
+  args:
+    executable: /bin/bash
+
+- name: Download Node.js 24 LTS tarball
+  ansible.builtin.get_url:
+    url: "https://nodejs.org/dist/latest-v24.x/{{ nodejs_filename.stdout }}"
+    dest: "/tmp/{{ nodejs_filename.stdout }}"
+    mode: '0644'
+    force: yes
+
+- name: Extract Node.js 24 LTS into /usr/local
+  ansible.builtin.unarchive:
+    src: "/tmp/{{ nodejs_filename.stdout }}"
+    dest: /usr/local
+    remote_src: yes
+    extra_opts:
+      - --strip-components=1
+
+- name: Remove Node.js 24 tarball
+  ansible.builtin.file:
+    path: "/tmp/{{ nodejs_filename.stdout }}"
+    state: absent
