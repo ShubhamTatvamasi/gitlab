@@ -1,0 +1,25 @@
+---
+- name: Ensure PowerShell execution policy allows scripts
+  win_shell: Set-ExecutionPolicy Bypass -Scope Process -Force
+  args:
+    executable: powershell.exe
+
+- name: Install Chocolatey if not already installed
+  win_stat:
+    path: '{{ windows_chocolatey_install_dir }}\bin\choco.exe'
+  register: choco_stat
+
+- name: Download and install Chocolatey
+  win_shell: |
+    Set-ExecutionPolicy Bypass -Scope Process -Force
+    [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
+    iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+  args:
+    executable: powershell.exe
+  when: not choco_stat.stat.exists
+
+- name: Install Chocolatey packages
+  win_chocolatey:
+    name: '{{ windows_chocolatey_packages }}'
+    state: present
+    ignore_checksums: yes

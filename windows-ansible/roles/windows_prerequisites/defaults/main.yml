@@ -1,0 +1,6 @@
+---
+# Windows prerequisites defaults
+windows_chocolatey_packages:
+  - git
+# Add more packages here as needed
+windows_chocolatey_install_dir: 'C:\ProgramData\chocolatey'

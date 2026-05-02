@@ -1,0 +1,9 @@
+---
+- name: Install GitLab Runner on Windows
+  hosts: all
+  gather_facts: false
+  vars:
+    ansible_winrm_server_cert_validation: ignore
+  roles:
+    - windows_prerequisites
+    - windows_gitlab_runner

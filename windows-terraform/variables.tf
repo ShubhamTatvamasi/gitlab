@@ -7,7 +7,7 @@ variable "project_name" {
 variable "sg_ports" {
   type        = list(number)
   description = "Security Group Ports"
-  default     = [3389]
+  default     = [3389, 5985, 5986]
 }
 
 variable "instance_type" {

@@ -1,0 +1,15 @@
+---
+# Windows GitLab Runner defaults
+windows_gitlab_runner_install_dir: 'C:\GitLab-Runner'
+windows_gitlab_runner_binary: 'C:\GitLab-Runner\gitlab-runner.exe'
+windows_gitlab_runner_binary_url: 'https://gitlab-runner-downloads.s3.amazonaws.com/latest/binaries/gitlab-runner-windows-amd64.exe'
+windows_gitlab_runner_service_name: 'gitlab-runner'
+windows_gitlab_runner_executor: 'shell'
+windows_gitlab_runner_shell: 'powershell'
+windows_gitlab_runner_description: 'windows-gitlab-runner'
+windows_gitlab_runner_tags: 'windows,gitlab-runner'
+windows_gitlab_runner_run_untagged: true
+windows_gitlab_runner_locked: false
+windows_gitlab_runner_coordinator_url: 'https://gitlab.example.com/'
+windows_gitlab_runner_registration_token: 'REPLACE_WITH_REGISTRATION_TOKEN'
+windows_gitlab_runner_auth_token: ''

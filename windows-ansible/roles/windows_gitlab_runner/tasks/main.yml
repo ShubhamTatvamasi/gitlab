@@ -1,0 +1,60 @@
+---
+- name: Ensure GitLab Runner install directory exists
+  win_file:
+    path: '{{ windows_gitlab_runner_install_dir }}'
+    state: directory
+
+- name: Download GitLab Runner binary
+  win_get_url:
+    url: '{{ windows_gitlab_runner_binary_url }}'
+    dest: '{{ windows_gitlab_runner_binary }}'
+    force: yes
+
+- name: Ensure GitLab Runner executable permissions
+  win_file:
+    path: '{{ windows_gitlab_runner_binary }}'
+    mode: '0755'
+
+- name: Install GitLab Runner service
+  win_shell: |
+    & "{{ windows_gitlab_runner_binary }}" install --working-directory "{{ windows_gitlab_runner_install_dir }}"
+  args:
+    executable: powershell.exe
+  register: gitlab_runner_service_install
+  changed_when: gitlab_runner_service_install.rc == 0
+
+- name: Ensure GitLab Runner service is started and enabled
+  win_service:
+    name: '{{ windows_gitlab_runner_service_name }}'
+    start_mode: auto
+    state: started
+
+- name: Register GitLab Runner with GitLab (auth token)
+  win_shell: |
+    & "{{ windows_gitlab_runner_binary }}" register --non-interactive \
+      --url "{{ windows_gitlab_runner_coordinator_url }}" \
+      --token "{{ windows_gitlab_runner_auth_token }}" \
+      --executor "{{ windows_gitlab_runner_executor }}" \
+      --shell "{{ windows_gitlab_runner_shell }}"
+  args:
+    executable: powershell.exe
+  when: windows_gitlab_runner_auth_token != ''
+  register: gitlab_runner_register
+  changed_when: gitlab_runner_register.rc == 0
+
+- name: Register GitLab Runner with GitLab (legacy reg token)
+  win_shell: |
+    & "{{ windows_gitlab_runner_binary }}" register --non-interactive \
+      --url "{{ windows_gitlab_runner_coordinator_url }}" \
+      -r "{{ windows_gitlab_runner_registration_token }}" \
+      --executor "{{ windows_gitlab_runner_executor }}" \
+      --shell "{{ windows_gitlab_runner_shell }}" \
+      --description "{{ windows_gitlab_runner_description }}" \
+      --tag-list "{{ windows_gitlab_runner_tags }}" \
+      --run-untagged "{{ windows_gitlab_runner_run_untagged | ternary('true','false') }}" \
+      --locked "{{ windows_gitlab_runner_locked | ternary('true','false') }}"
+  args:
+    executable: powershell.exe
+  when: windows_gitlab_runner_auth_token == '' and windows_gitlab_runner_registration_token != ''
+  register: gitlab_runner_register_legacy
+  changed_when: gitlab_runner_register_legacy.rc == 0

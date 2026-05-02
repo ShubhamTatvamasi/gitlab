@@ -1,0 +1,5 @@
+---
+- name: restart gitlab-runner
+  win_service:
+    name: '{{ windows_gitlab_runner_service_name }}'
+    state: restarted
