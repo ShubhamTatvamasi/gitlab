@@ -20,24 +20,40 @@ Invoke-WebRequest -Uri "https://s3.dualstack.us-east-1.amazonaws.com/gitlab-runn
 Create the runner in the GitLab UI or API first, then use the runner authentication token.
 
 ```powershell
-& "C:\GitLab-Runner\gitlab-runner.exe" register --non-interactive --url "https://gitlab.example.com/" --token "REPLACE_WITH_AUTH_TOKEN"
+& "C:\GitLab-Runner\gitlab-runner.exe" register --non-interactive --url "https://gitlab.example.com/" --token "REPLACE_WITH_AUTH_TOKEN" --executor "shell" --shell "powershell"
 ```
 
-### Legacy registration token (deprecated)
-If you are on an older GitLab version or still using legacy registration tokens, you can use:
+If `pwsh` is not installed on your Windows Server Core image, use the Windows PowerShell shell instead:
 
 ```powershell
-& "C:\GitLab-Runner\gitlab-runner.exe" register --non-interactive --url "https://gitlab.example.com/" --registration-token "REPLACE_WITH_REGISTRATION_TOKEN" --executor "shell" --description "windows-gitlab-runner" --tag-list "windows,gitlab-runner" --run-untagged="true" --locked="false"
+& "C:\GitLab-Runner\gitlab-runner.exe" register --non-interactive --url "https://gitlab.example.com/" --token "REPLACE_WITH_AUTH_TOKEN" --executor "shell" --shell "powershell"
 ```
 
-4. Verify the service is running:
+If that still fails because `pwsh` is not available on the image, use `--shell "cmd"` instead or install PowerShell Core (`pwsh`).
+
+### Legacy registration token (deprecated)
+If you have to use the legacy registration token workflow, use `-r`/`--registration-token` rather than `-t`/`--token`:
+
+```powershell
+& "C:\GitLab-Runner\gitlab-runner.exe" register --non-interactive --url "https://gitlab.example.com/" --registration-token "REPLACE_WITH_REGISTRATION_TOKEN" --executor "shell" --shell "powershell" --description "windows-gitlab-runner" --tag-list "windows,gitlab-runner" --run-untagged="true" --locked="false"
+```
+
+Or using the short form:
+
+```powershell
+& "C:\GitLab-Runner\gitlab-runner.exe" register --non-interactive --url "https://gitlab.example.com/" -r "REPLACE_WITH_REGISTRATION_TOKEN" --executor "shell" --shell "powershell" --description "windows-gitlab-runner" --tag-list "windows,gitlab-runner" --run-untagged="true" --locked="false"
+```
+
+If that still fails because `pwsh` is not available on the image, use `--shell "cmd"` instead or install PowerShell Core (`pwsh`).
+
+1. Verify the service is running:
 ```powershell
 Get-Service gitlab-runner
 ```
 
 ## Placeholder values
 - `https://gitlab.example.com/` → replace with your GitLab instance URL
-- `REPLACE_WITH_REGISTRATION_TOKEN` → replace with your runner registration token
+- `REPLACE_WITH_AUTH_TOKEN` → replace with your runner authentication token
 
 ## Notes
 - If you want to use a different executor, change `--executor "shell"` to the appropriate value, such as `powershell`, `docker`, or `docker-windows`.
